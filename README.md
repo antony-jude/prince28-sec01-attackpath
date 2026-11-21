@@ -2,7 +2,7 @@
 
 Maps an incident description or log snippet to MITRE ATT&CK tactics, techniques, and mitigations, with links to the source technique pages.
 
-**Status:** Day 1 foundation (uv project, FastAPI health endpoint, quality gates). Live URL planned for Day 5.
+**Status:** Day 1 foundation (uv project, FastAPI service skeleton, sample ATT&CK records, and quality gates). Live URL planned for Day 5.
 
 ## Who it's for
 
@@ -36,14 +36,19 @@ At least 80% top-3 technique-mapping accuracy on a reviewed 50-incident test set
 
 ```powershell
 uv sync
+Copy-Item .env.example .env
 uv run uvicorn attackpath.api.main:create_app --factory --reload
 ```
 
-Open [http://localhost:8000/docs](http://localhost:8000/docs) for the API docs or [http://localhost:8000/health](http://localhost:8000/health) for the health check.
+Open [http://localhost:8000/docs](http://localhost:8000/docs) for the API docs. The service provides `/health`, `/ready`, `/v1/documents`, and `/v1/documents/{id}`.
 
 ## Checks
 
 ```powershell
 uv run pytest
 uv run ruff check .
+uv run pre-commit install
+uv run pre-commit run --all-files
 ```
+
+`.env` is ignored by Git; commit `.env.example` only. The sample ATT&CK records are a small starter set, not a scored evaluation dataset.
