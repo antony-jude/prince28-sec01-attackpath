@@ -1,0 +1,52 @@
+[
+  {
+    "id": "001",
+    "technique_id": "T1059.001",
+    "name": "Command and Scripting Interpreter: PowerShell",
+    "tactic": ["Execution"],
+    "platforms": ["Windows"],
+    "data_sources": ["Command: Command Execution", "Process: Process Creation", "Script: Script Execution"],
+    "mitigations": null,
+    "detection": null
+  },
+  {
+    "id": "002",
+    "technique_id": "T1053.005",
+    "name": "Scheduled Task/Job: Scheduled Task",
+    "tactic": ["Execution", "Persistence"],
+    "platforms": ["Windows"],
+    "data_sources": ["Scheduled Job: Scheduled Job Creation", "Scheduled Job: Scheduled Job Modification"],
+    "mitigations": null,
+    "detection": null
+  },
+  {
+    "id": "003",
+    "technique_id": "T1566.001",
+    "name": "Phishing: Spearphishing Attachment",
+    "tactic": ["Initial Access"],
+    "platforms": ["Linux", "macOS", "Windows", "Office 365"],
+    "data_sources": ["Application Log: Application Log Content", "File: File Creation"],
+    "mitigations": null,
+    "detection": null
+  },
+  {
+    "id": "004",
+    "technique_id": "T1071.001",
+    "name": "Application Layer Protocol: Web Protocols",
+    "tactic": ["Command and Control"],
+    "platforms": ["Linux", "macOS", "Windows"],
+    "data_sources": ["Network Traffic: Network Traffic Content"],
+    "mitigations": null,
+    "detection": null
+  },
+  {
+    "id": "005",
+    "technique_id": "T1003.001",
+    "name": "OS Credential Dumping: LSASS Memory",
+    "tactic": ["Credential Access"],
+    "platforms": ["Windows"],
+    "data_sources": ["Process: Process Access", "Operating System: OS API Execution"],
+    "mitigations": null,
+    "detection": null
+  }
+]

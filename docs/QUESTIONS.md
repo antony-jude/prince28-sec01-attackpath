@@ -7,7 +7,7 @@ These are ten seed prompts for the future evaluation set. They are not scored ex
 3. A suspicious executable is configured to run automatically each time a workstation starts. Which persistence behavior does this suggest?
 4. An unfamiliar process creates a new scheduled task shortly after an untrusted program runs. Which techniques may explain the persistence and execution?
 5. A public-facing web server starts running commands through a newly discovered server-side script. Which techniques fit the evidence?
-6. A user account signs in from an unusual location, then creates an unexpected inbox rule that forwards messages externally. Which techniques are relevant?
+6. A log contains only a process ID (`1234`) and timestamp. It omits the hostname, executable, user, command line, and surrounding events. Which ATT&CK technique was used?
 7. A cloud audit log shows a principal listing resources and creating a new access key outside its normal workflow. Which techniques should be considered?
 8. Several files on a workstation and a mapped share are renamed and become unreadable; a ransom note appears. Which techniques describe the observed impact?
 9. An external host initiates repeated remote desktop connections to several workstations, followed by interactive logons. Which techniques may apply?
