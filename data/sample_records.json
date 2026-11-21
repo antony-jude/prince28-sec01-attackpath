@@ -2,51 +2,633 @@
   {
     "id": "001",
     "technique_id": "T1059.001",
-    "name": "Command and Scripting Interpreter: PowerShell",
-    "tactic": ["Execution"],
-    "platforms": ["Windows"],
-    "data_sources": ["Command: Command Execution", "Process: Process Creation", "Script: Script Execution"],
-    "mitigations": null,
-    "detection": null
+    "name": "PowerShell",
+    "tactic": [
+      "Execution"
+    ],
+    "platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ],
+    "data_sources": [
+      "Command Execution",
+      "Module Load",
+      "Process Creation",
+      "Process Metadata"
+    ],
+    "mitigations": [
+      "Antivirus/Antimalware",
+      "Code Signing",
+      "Disable or Remove Feature or Program",
+      "Execution Prevention",
+      "Privileged Account Management"
+    ],
+    "detection": [
+      "Detects behavioral chains where PowerShell is launched with encoded commands, unusual parent processes, or suspicious modules loaded, potentially followed by network connections or child process spawning. Supports detection of both direct (powershell.exe) and indirect (.NET automation) invocations."
+    ]
   },
   {
     "id": "002",
     "technique_id": "T1053.005",
-    "name": "Scheduled Task/Job: Scheduled Task",
-    "tactic": ["Execution", "Persistence"],
-    "platforms": ["Windows"],
-    "data_sources": ["Scheduled Job: Scheduled Job Creation", "Scheduled Job: Scheduled Job Modification"],
-    "mitigations": null,
-    "detection": null
+    "name": "Scheduled Task",
+    "tactic": [
+      "Execution",
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "platforms": [
+      "Windows"
+    ],
+    "data_sources": [
+      "File Creation",
+      "Process Creation",
+      "Scheduled Job Creation",
+      "Scheduled Job Modification",
+      "Windows Registry Key Modification"
+    ],
+    "mitigations": [
+      "Audit",
+      "Operating System Configuration",
+      "Privileged Account Management",
+      "User Account Management"
+    ],
+    "detection": [
+      "Detects the creation, modification, or deletion of scheduled tasks through Task Scheduler, WMI, PowerShell, or API-based methods followed by execution from svchost.exe or taskeng.exe. Includes detection of hidden or anomalous scheduled tasks, especially those created under SYSTEM or suspicious user contexts."
+    ]
   },
   {
     "id": "003",
     "technique_id": "T1566.001",
-    "name": "Phishing: Spearphishing Attachment",
-    "tactic": ["Initial Access"],
-    "platforms": ["Linux", "macOS", "Windows", "Office 365"],
-    "data_sources": ["Application Log: Application Log Content", "File: File Creation"],
-    "mitigations": null,
-    "detection": null
+    "name": "Spearphishing Attachment",
+    "tactic": [
+      "Initial Access"
+    ],
+    "platforms": [
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "data_sources": [
+      "Application Log Content",
+      "File Creation",
+      "Network Connection Creation",
+      "Network Traffic Flow",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Antivirus/Antimalware",
+      "Audit",
+      "Network Intrusion Prevention",
+      "Restrict Web-Based Content",
+      "Software Configuration",
+      "User Account Management",
+      "User Training"
+    ],
+    "detection": [
+      "Detection of spearphishing attachments by correlating suspicious email delivery with subsequent file creation and abnormal process execution (e.g., Office spawning PowerShell or CMD). Behavior chain includes inbound email metadata → attachment stored on disk → process execution → outbound network activity.",
+      "Phishing attachments executed on Linux systems are detected by linking email logs to file creation in mail directories and subsequent suspicious process execution. Look for unexpected binaries or scripts spawned from user mail directories and anomalous outbound network activity.",
+      "Phishing attachment detection on macOS through correlation of Mail app logs, file creation in user directories, and abnormal process execution (e.g., Preview.app or Mail.app spawning Terminal or scripting binaries). Network traffic after attachment interaction is also monitored."
+    ]
   },
   {
     "id": "004",
     "technique_id": "T1071.001",
-    "name": "Application Layer Protocol: Web Protocols",
-    "tactic": ["Command and Control"],
-    "platforms": ["Linux", "macOS", "Windows"],
-    "data_sources": ["Network Traffic: Network Traffic Content"],
-    "mitigations": null,
-    "detection": null
+    "name": "Web Protocols",
+    "tactic": [
+      "Command and Control"
+    ],
+    "platforms": [
+      "ESXi",
+      "Linux",
+      "macOS",
+      "Network Devices",
+      "Windows"
+    ],
+    "data_sources": [
+      "Command Execution",
+      "Network Connection Creation",
+      "Network Traffic Content",
+      "Network Traffic Flow",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Filter Network Traffic",
+      "Network Intrusion Prevention"
+    ],
+    "detection": [
+      "Detects unexpected or high-volume HTTP/S/WebSocket communication from suspicious processes (e.g., PowerShell, rundll32) using uncommon user agents or mimicking browser traffic to unusual domains or IPs.",
+      "Detects curl, wget, Python requests, or custom HTTP clients communicating over non-standard ports, with repetitive or beacon-like patterns or POST-heavy behavior to rare domains.",
+      "Detects applications such as Automator, AppleScript, or LaunchDaemons invoking HTTP/S traffic to non-standard domains or using suspicious headers (e.g., Base64 in URIs or cookie fields).",
+      "Detects HTTP or HTTPS communication initiated by shell-based scripts or management daemons, especially those reaching public IPs over ports 80/443 using embedded curl or wget.",
+      "Detects Web protocol misuse such as encoded HTTP headers, WebSocket upgrade requests with abnormal payloads, or TLS handshake anomalies suggesting embedded C2 channels."
+    ]
   },
   {
     "id": "005",
     "technique_id": "T1003.001",
-    "name": "OS Credential Dumping: LSASS Memory",
-    "tactic": ["Credential Access"],
-    "platforms": ["Windows"],
-    "data_sources": ["Process: Process Access", "Operating System: OS API Execution"],
+    "name": "LSASS Memory",
+    "tactic": [
+      "Credential Access"
+    ],
+    "platforms": [
+      "Windows"
+    ],
+    "data_sources": [
+      "File Creation",
+      "Process Access",
+      "Process Creation",
+      "User Account Metadata",
+      "Windows Registry Key Modification"
+    ],
+    "mitigations": [
+      "Behavior Prevention on Endpoint",
+      "Credential Access Protection",
+      "Operating System Configuration",
+      "Password Policies",
+      "Privileged Account Management",
+      "Privileged Process Integrity",
+      "User Training"
+    ],
+    "detection": [
+      "A non-privileged or abnormal process attempts to open a handle with full access (0x1F0FFF) to lsass.exe and subsequently invokes memory dump, file creation, or registry modification indicative of credential scraping. This behavior chain reflects staged credential theft activity."
+    ]
+  },
+  {
+    "id": "006",
+    "technique_id": "T1059.003",
+    "name": "Windows Command Shell",
+    "tactic": [
+      "Execution"
+    ],
+    "platforms": [
+      "Windows"
+    ],
+    "data_sources": [
+      "Module Load",
+      "Process Creation",
+      "Script Execution"
+    ],
+    "mitigations": [
+      "Execution Prevention"
+    ],
+    "detection": [
+      "Detects interactive or scripted abuse of cmd.exe, batch files, or shell invocation chains. Focuses on parent-child relationships (e.g., cmd.exe launched from unusual parents), anomalous command-line parameters, and chaining with discovery, credential access, or lateral movement behaviors."
+    ]
+  },
+  {
+    "id": "007",
+    "technique_id": "T1059.005",
+    "name": "Visual Basic",
+    "tactic": [
+      "Execution"
+    ],
+    "platforms": [
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "data_sources": [
+      "Command Execution",
+      "Module Load",
+      "Process Creation",
+      "Script Execution"
+    ],
+    "mitigations": [
+      "Antivirus/Antimalware",
+      "Behavior Prevention on Endpoint",
+      "Disable or Remove Feature or Program",
+      "Execution Prevention",
+      "Restrict Web-Based Content"
+    ],
+    "detection": [
+      "Detects execution of VB-based scripts or macros (VBS/VBA/VBScript) through cscript.exe/wscript.exe, Office-based process chains, or HTA usage. Focuses on chained behavior: Office or HTML container spawns script host > script host spawns PowerShell, network connections, or process injection.",
+      "Detects embedded or emulated VBScript/VBA execution via Wine-based apps, Office for Mac abusing cross-platform .NET features, or macros dropped and invoked via AppleScript or third-party automation tools.",
+      "Detects abuse of Mono/.NET Core environments to execute VB-like scripts, often in environments with Office emulation or WINE. Focus is on rare invocations of scripting hosts like mono.exe or .NET shells, often seen in spam filtering or forensic labs with Office support."
+    ]
+  },
+  {
+    "id": "008",
+    "technique_id": "T1059.007",
+    "name": "JavaScript",
+    "tactic": [
+      "Execution"
+    ],
+    "platforms": [
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "data_sources": [
+      "Command Execution",
+      "Module Load",
+      "Process Creation",
+      "Script Execution"
+    ],
+    "mitigations": [
+      "Behavior Prevention on Endpoint",
+      "Disable or Remove Feature or Program",
+      "Execution Prevention",
+      "Restrict Web-Based Content"
+    ],
+    "detection": [
+      "Detects JavaScript execution through WSH (wscript.exe, cscript.exe) or HTA (mshta.exe), particularly when spawned from Office macros, web browsers, or abnormal user paths. Correlates script execution with outbound network activity or system modification.",
+      "Detects JavaScript for Automation (JXA) via osascript or compiled scripts using OSAKit APIs. Flags execution involving system modification, inter-process scripting, or browser abuse.",
+      "Detects Node.js or JavaScript interpreter execution from web shells, cron jobs, or local users. Correlates execution with reverse shell behavior, file modifications, or abnormal outbound connections."
+    ]
+  },
+  {
+    "id": "009",
+    "technique_id": "T1078",
+    "name": "Valid Accounts",
+    "tactic": [
+      "Stealth",
+      "Persistence",
+      "Privilege Escalation",
+      "Initial Access"
+    ],
+    "platforms": [
+      "Containers",
+      "ESXi",
+      "IaaS",
+      "Identity Provider",
+      "Linux",
+      "macOS",
+      "Network Devices",
+      "Office Suite",
+      "SaaS",
+      "Windows"
+    ],
+    "data_sources": [
+      "Logon Session Creation",
+      "Logon Session Metadata",
+      "Process Creation",
+      "User Account Authentication"
+    ],
+    "mitigations": [
+      "Account Use Policies",
+      "Active Directory Configuration",
+      "Application Developer Guidance",
+      "Multi-factor Authentication",
+      "Password Policies",
+      "Privileged Account Management",
+      "User Account Management",
+      "User Training"
+    ],
+    "detection": [
+      "Detection of compromised or misused valid accounts via anomalous logon patterns, abnormal logon types, and inconsistent geographic or time-based activity across Windows endpoints.",
+      "Detection of valid account misuse through SSH logins, sudo/su abuse, and service account anomalies outside expected patterns.",
+      "Detection of interactive and remote logins by service accounts or users at unusual times, with unexpected child process activity.",
+      "Detection of valid account abuse in IdP logs via geographic anomalies, impossible travel, risky sign-ins, and multiple MFA attempts or failures.",
+      "Detection of containerized service accounts or compromised kubeconfigs being used for cluster access from unexpected nodes or IPs."
+    ]
+  },
+  {
+    "id": "010",
+    "technique_id": "T1021.001",
+    "name": "Remote Desktop Protocol",
+    "tactic": [
+      "Lateral Movement"
+    ],
+    "platforms": [
+      "Windows"
+    ],
+    "data_sources": [
+      "Logon Session Creation",
+      "Logon Session Metadata",
+      "Network Connection Creation",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Audit",
+      "Disable or Remove Feature or Program",
+      "Limit Access to Resource Over Network",
+      "Multi-factor Authentication",
+      "Network Segmentation",
+      "Operating System Configuration",
+      "Privileged Account Management",
+      "User Account Management"
+    ],
+    "detection": [
+      "Remote Desktop (RDP) logon by a user followed by unusual process execution, file access, or lateral movement activity within a short timeframe."
+    ]
+  },
+  {
+    "id": "011",
+    "technique_id": "T1547.001",
+    "name": "Registry Run Keys / Startup Folder",
+    "tactic": [
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "platforms": [
+      "Windows"
+    ],
+    "data_sources": [
+      "File Creation",
+      "Process Creation",
+      "Windows Registry Key Modification"
+    ],
     "mitigations": null,
-    "detection": null
+    "detection": [
+      "Correlation of Registry key creation/modification events under known Run/Startup keys with new or unusual binary paths or script-based payloads. Multi-event detection includes registry modification followed by process execution from non-standard directories or abnormal parent-child process relationships."
+    ]
+  },
+  {
+    "id": "012",
+    "technique_id": "T1055",
+    "name": "Process Injection",
+    "tactic": [
+      "Stealth",
+      "Privilege Escalation"
+    ],
+    "platforms": [
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "data_sources": [
+      "File Access",
+      "Module Load",
+      "OS API Execution",
+      "Process Access",
+      "Process Creation",
+      "Process Metadata",
+      "Process Modification"
+    ],
+    "mitigations": [
+      "Behavior Prevention on Endpoint",
+      "Privileged Account Management"
+    ],
+    "detection": [
+      "Detects process injection by correlating memory manipulation API calls (e.g., VirtualAllocEx, WriteProcessMemory), suspicious thread creation (e.g., CreateRemoteThread), and unusual DLL loads within another process's context.",
+      "Detects ptrace- or memfd-based process injection through audit logs capturing system calls (e.g., ptrace, mmap) targeting running processes along with suspicious file descriptors or memory writes.",
+      "Detects memory-based injection by monitoring `task_for_pid`, `mach_vm_write`, and dylib injection patterns through `DYLD_INSERT_LIBRARIES` or manual memory mapping."
+    ]
+  },
+  {
+    "id": "013",
+    "technique_id": "T1105",
+    "name": "Ingress Tool Transfer",
+    "tactic": [
+      "Command and Control"
+    ],
+    "platforms": [
+      "ESXi",
+      "Linux",
+      "macOS",
+      "Network Devices",
+      "Windows"
+    ],
+    "data_sources": [
+      "Command Execution",
+      "File Creation",
+      "Network Connection Creation",
+      "Network Traffic Flow",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Filter Network Traffic",
+      "Network Intrusion Prevention"
+    ],
+    "detection": [
+      "Unusual or uncommon processes initiate network connections to external destinations followed by file creation (tools downloaded).",
+      "Shell-based tools (curl, wget, scp) initiate connections to external domains followed by creation of executable files on disk.",
+      "Process execution of curl or wget followed by a network connection and a file created in temporary or user-specific directories.",
+      "Command line interface or vCLI triggers remote transfer using wget or curl, writing files into datastore paths or local tmp directories.",
+      "Network device logs show anomalous inbound file transfers or uncharacteristic flows with high payload volume to network devices with storage or automation hooks."
+    ]
+  },
+  {
+    "id": "014",
+    "technique_id": "T1110.003",
+    "name": "Password Spraying",
+    "tactic": [
+      "Credential Access"
+    ],
+    "platforms": [
+      "Containers",
+      "ESXi",
+      "IaaS",
+      "Identity Provider",
+      "Linux",
+      "Network Devices",
+      "Office Suite",
+      "SaaS",
+      "Windows",
+      "macOS"
+    ],
+    "data_sources": [
+      "User Account Authentication"
+    ],
+    "mitigations": [
+      "Account Use Policies",
+      "Multi-factor Authentication",
+      "Password Policies"
+    ],
+    "detection": [
+      "A high volume of authentication failures using a single password (or small set) across many different user accounts within a defined time window",
+      "Authentication failures across different accounts using a repeated or similar password via SSH or PAM stack within a short window",
+      "Multiple failed login attempts across different users using common password patterns (e.g., 'Welcome2023')",
+      "Sign-in failures across enterprise SSO applications or SaaS platforms from same IP address using the same password against multiple user identities",
+      "Authentication failure logs on routers/switches showing repeated use of default or common passwords across multiple accounts",
+      "Repeated failed authentication attempts to container APIs, control planes, or login shells across many user names using same password",
+      "Failed authentication attempts across user mailboxes using identical or common passwords (e.g., OWA brute attempts)",
+      "SaaS applications receiving authentication failures for dozens of accounts using same password or login signature"
+    ]
+  },
+  {
+    "id": "015",
+    "technique_id": "T1490",
+    "name": "Inhibit System Recovery",
+    "tactic": [
+      "Impact"
+    ],
+    "platforms": [
+      "Containers",
+      "ESXi",
+      "IaaS",
+      "Linux",
+      "macOS",
+      "Network Devices",
+      "Windows"
+    ],
+    "data_sources": [
+      "Cloud Storage Deletion",
+      "Command Execution",
+      "File Deletion",
+      "Process Creation",
+      "Service Metadata",
+      "Snapshot Deletion",
+      "Windows Registry Key Modification"
+    ],
+    "mitigations": [
+      "Data Backup",
+      "Execution Prevention",
+      "Operating System Configuration",
+      "User Account Management"
+    ],
+    "detection": [
+      "Process chains that use native utilities (vssadmin, wbadmin, diskshadow, bcdedit, REAgentC, wmic) with arguments to delete shadow copies, disable recovery, or remove backup catalogs",
+      "Shell utilities or scripts deleting `/etc/systemd/system/rescue.target`, `/etc/fstab` backups, or `/boot/efi` partitions; chattr used to block snapshot auto-recovery",
+      "ESXi shell or vim-cmd execution that deletes all VM snapshots using vmsvc/snapshot.removeall or rm on snapshot paths",
+      "Execution of `erase`, `format`, and `reload` in immediate sequence from a privileged AAA session",
+      "Cloud API calls disabling snapshot scheduling, backup policies, versioning, followed by DeleteSnapshot/DeleteVolume operations"
+    ]
+  },
+  {
+    "id": "016",
+    "technique_id": "T1047",
+    "name": "Windows Management Instrumentation",
+    "tactic": [
+      "Execution"
+    ],
+    "platforms": [
+      "Windows"
+    ],
+    "data_sources": [
+      "Network Connection Creation",
+      "Process Creation",
+      "WMI Creation"
+    ],
+    "mitigations": [
+      "Behavior Prevention on Endpoint",
+      "Execution Prevention",
+      "Privileged Account Management",
+      "User Account Management"
+    ],
+    "detection": [
+      "Detects adversarial abuse of WMI to execute local or remote commands via WMIC, PowerShell, or COM API through a multi-event chain: process creation, command execution, and corresponding network connection if remote."
+    ]
+  },
+  {
+    "id": "017",
+    "technique_id": "T1053.003",
+    "name": "Cron",
+    "tactic": [
+      "Execution",
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "platforms": [
+      "Linux",
+      "macOS",
+      "ESXi"
+    ],
+    "data_sources": [
+      "File Modification",
+      "Process Creation",
+      "Scheduled Job Creation"
+    ],
+    "mitigations": [
+      "Audit",
+      "User Account Management"
+    ],
+    "detection": [
+      "Detects creation or modification of crontab entries by non-root users or from abnormal parent processes, followed by the execution of uncommon binaries at scheduled intervals.",
+      "Detects crontab job additions or modifications via `crontab` utility or direct edits, especially those created by interactive users executing hidden or renamed scripts.",
+      "Detects direct modification of crontab entries in /var/spool/cron/crontabs/root or /etc/rc.local.d/local.sh followed by execution of scripts linked to lateral movement or malware persistence."
+    ]
+  },
+  {
+    "id": "018",
+    "technique_id": "T1071.004",
+    "name": "DNS",
+    "tactic": [
+      "Command and Control"
+    ],
+    "platforms": [
+      "ESXi",
+      "Linux",
+      "macOS",
+      "Network Devices",
+      "Windows"
+    ],
+    "data_sources": [
+      "Network Connection Creation",
+      "Network Traffic Content",
+      "Network Traffic Flow",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Filter Network Traffic",
+      "Network Intrusion Prevention"
+    ],
+    "detection": [
+      "Detects high-frequency or anomalous DNS queries initiated by non-browser, non-system processes (e.g., PowerShell, rundll32, python.exe) used to establish command and control via DNS tunneling.",
+      "Detects local daemons or scripts generating outbound DNS queries with long or frequent subdomains, indicative of DNS tunneling via tools like `iodine`, `dnscat2`, or `dig` from cronjobs or reverse shells.",
+      "Detects scripting environments (AppleScript, osascript, curl) or non-native tools performing DNS queries with encoded subdomains, often used for data exfiltration or beaconing.",
+      "Detects clients issuing DNS queries with high volume, long subdomain lengths, encoded payload patterns, or to known malicious infrastructure; indicative of DNS-based C2 channels.",
+      "Detects unusual outbound DNS traffic from ESXi hosts, often from shell scripts, custom daemons, or malicious VIBs interacting with external DNS infrastructure outside the management plane."
+    ]
+  },
+  {
+    "id": "019",
+    "technique_id": "T1566.002",
+    "name": "Spearphishing Link",
+    "tactic": [
+      "Initial Access"
+    ],
+    "platforms": [
+      "Identity Provider",
+      "Linux",
+      "macOS",
+      "Office Suite",
+      "SaaS",
+      "Windows"
+    ],
+    "data_sources": [
+      "Application Log Content",
+      "Network Connection Creation",
+      "Network Traffic Content",
+      "Network Traffic Flow",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Audit",
+      "Restrict Web-Based Content",
+      "Software Configuration",
+      "User Account Management",
+      "User Training"
+    ],
+    "detection": [
+      "Correlation of inbound emails with embedded links followed by user-driven browser navigation to suspicious or obfuscated domains. Detection chain includes malicious URL in email → user click recorded in Office logs → browser process spawning unusual child processes (e.g., PowerShell, cmd) or download activity.",
+      "Detection of spearphishing links through mail logs and browser activity. Behavior includes email with suspicious URLs → user click recorded in mail/web proxy logs → shell or interpreter launched from browser process.",
+      "Correlation of Mail.app logs with Safari/Chrome activity. Suspicious behavior includes email links → Safari/Chrome accessing newly registered or lookalike domains → osascript or Terminal spawned unexpectedly.",
+      "Detection of OAuth consent phishing or malicious login attempts initiated through spearphishing links. Behavior chain includes inbound email with OAuth URL → consent page visited → unusual token grants logged in IdP logs."
+    ]
+  },
+  {
+    "id": "020",
+    "technique_id": "T1486",
+    "name": "Data Encrypted for Impact",
+    "tactic": [
+      "Impact"
+    ],
+    "platforms": [
+      "ESXi",
+      "IaaS",
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "data_sources": [
+      "Cloud Storage Modification",
+      "Command Execution",
+      "File Creation",
+      "File Modification",
+      "Process Creation"
+    ],
+    "mitigations": [
+      "Behavior Prevention on Endpoint",
+      "Data Backup"
+    ],
+    "detection": [
+      "High-frequency file write operations using uncommon extensions, followed by ransom note creation, registry tampering, or shadow copy deletion. Often uses CLI tools like vssadmin, wbadmin, cipher, or PowerShell.",
+      "Encryption via custom or open-source tools (e.g., openssl, gpg, aescrypt) recursively targeting user or system directories. Also includes overwrite of existing data and ransom note drops.",
+      "Userland or kernel-level ransomware encrypting user files (Documents, Desktop) using `srm`, `gpg`, or compiled payloads. Often correlated with ransom note creation in multiple directories.",
+      "Ransomware encrypts .vmdk, .vmx, .log, or VM config files in VMFS datastores. May rename to .locked or delete/overwrite with encrypted versions. Often correlates with shell commands run through `dcui`, SSH, or vSphere.",
+      "Encryption of cloud storage objects (e.g., S3 buckets) via Server-Side Encryption (SSE-C) or by replacing objects with encrypted variants. May include API patterns like PutObject with SSE-C headers."
+    ]
   }
 ]

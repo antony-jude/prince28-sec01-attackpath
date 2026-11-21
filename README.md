@@ -20,6 +20,8 @@ MITRE ATT&CK Enterprise, Mobile, and ICS knowledge bases (STIX 2.1 JSON): techni
 - [MITRE ATT&CK STIX data](https://github.com/mitre-attack/attack-stix-data)
 - Follow MITRE ATT&CK terms of use and attribution requirements.
 
+The starter records in `data/sample_records.json` are sourced from the MITRE ATT&CK Enterprise v20.1 STIX 2.1 release. `data_sources`, `mitigations`, and `detection` are populated from the linked data components, mitigation relationships, and detection analytics in that release.
+
 ## Hardest problem (my interview story)
 
 IDs change between releases: techniques can be deprecated, revoked, or split into sub-techniques (for example, T1086 PowerShell was revoked and replaced by T1059.001). Answers must resolve old IDs to the current technique, while exact-ID questions such as `T1059.001` need exact lookup because embeddings can treat IDs as noise.
