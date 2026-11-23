@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from attackpath.api.deps import get_repository
+from attackpath.api.deps import check_db, get_repository
 from attackpath.api.main import create_app
 from attackpath.config import Settings
 
@@ -25,7 +25,12 @@ def data_file(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def client(data_file: Path) -> Iterator[TestClient]:
+def db_state() -> dict[str, bool]:
+    return {"up": True}
+
+
+@pytest.fixture
+def client(data_file: Path, db_state: dict[str, bool]) -> Iterator[TestClient]:
     settings = Settings(app_env="ci", data_file=data_file, _env_file=None)
     with TestClient(create_app(settings)) as test_client:
 
@@ -58,4 +63,5 @@ def client(data_file: Path) -> Iterator[TestClient]:
 
         test_client.app.state.session_factory = lambda: FakeSessionContext()
         test_client.app.dependency_overrides[get_repository] = lambda: FakeRepository()
+        test_client.app.dependency_overrides[check_db] = lambda: db_state["up"]
         yield test_client
