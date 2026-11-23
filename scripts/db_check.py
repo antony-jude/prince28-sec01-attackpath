@@ -6,10 +6,12 @@ from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import SQLAlchemyError
 
-from attackpath.db.session import engine
+from attackpath.config import get_settings
+from attackpath.db.session import make_engine
 
 
 async def main() -> None:
+    engine = make_engine(get_settings())
     try:
         async with engine.connect() as connection:
             row = await connection.execute(text("select current_database(), version()"))

@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
+from attackpath.api.deps import get_repository
 from attackpath.api.main import create_app
 from attackpath.config import Settings
 
@@ -27,4 +28,34 @@ def data_file(tmp_path: Path) -> Path:
 def client(data_file: Path) -> Iterator[TestClient]:
     settings = Settings(app_env="ci", data_file=data_file, _env_file=None)
     with TestClient(create_app(settings)) as test_client:
+
+        class FakeRepository:
+            async def list(self, *, q, filters, limit, offset):
+                items = [
+                    record
+                    for record in SAMPLE
+                    if (not q or q.casefold() in json.dumps(record).casefold())
+                    and all(str(record.get(key)) == value for key, value in filters.items())
+                ]
+                return len(items), items[offset : offset + limit]
+
+            async def get(self, external_id):
+                for record in SAMPLE:
+                    if record["id"] == external_id:
+                        return record
+                return None
+
+        class FakeSession:
+            async def execute(self, *_args, **_kwargs):
+                return None
+
+        class FakeSessionContext:
+            async def __aenter__(self):
+                return FakeSession()
+
+            async def __aexit__(self, *_args):
+                return False
+
+        test_client.app.state.session_factory = lambda: FakeSessionContext()
+        test_client.app.dependency_overrides[get_repository] = lambda: FakeRepository()
         yield test_client
