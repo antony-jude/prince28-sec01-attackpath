@@ -35,13 +35,20 @@ def client(data_file: Path, db_state: dict[str, bool]) -> Iterator[TestClient]:
     with TestClient(create_app(settings)) as test_client:
 
         class FakeRepository:
-            async def list(self, *, q, filters, limit, offset):
+            async def list(self, *, q, filters, limit, offset, sort="external_id"):
                 items = [
                     record
                     for record in SAMPLE
                     if (not q or q.casefold() in json.dumps(record).casefold())
                     and all(str(record.get(key)) == value for key, value in filters.items())
                 ]
+                descending = sort.startswith("-")
+                sort_field = sort.removeprefix("-")
+                if sort_field in {"title", "published_on", "external_id"}:
+                    items.sort(
+                        key=lambda record: str(record.get(sort_field, record["id"])),
+                        reverse=descending,
+                    )
                 return len(items), items[offset : offset + limit]
 
             async def get(self, external_id):

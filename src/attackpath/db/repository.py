@@ -46,6 +46,7 @@ class DocumentRepository:
         filters: dict[str, str],
         limit: int,
         offset: int,
+        sort: str = "external_id",
     ) -> tuple[int, list[dict[str, Any]]]:
         stmt = select(Document)
         if q:
@@ -54,18 +55,31 @@ class DocumentRepository:
                 or_(Document.title.ilike(like), cast(Document.metadata_, Text).ilike(like))
             )
         for key, value in filters.items():
-            stmt = stmt.where(
-                or_(
-                    *(
-                        Document.metadata_.contains({key: candidate})
-                        for candidate in _value_candidates(value)
+            if key == "technique_id":
+                stmt = stmt.where(Document.technique_id == value)
+            else:
+                stmt = stmt.where(
+                    or_(
+                        *(
+                            Document.metadata_.contains({key: candidate})
+                            for candidate in _value_candidates(value)
+                        )
                     )
                 )
-            )
         total = await self.session.scalar(select(func.count()).select_from(stmt.subquery()))
-        rows = await self.session.scalars(
-            stmt.order_by(Document.external_id).limit(limit).offset(offset)
-        )
+        descending = sort.startswith("-")
+        sort_field = sort.removeprefix("-")
+        sort_columns = {
+            "title": Document.title,
+            "published_on": Document.published_on,
+            "external_id": Document.external_id,
+        }
+        column = sort_columns.get(sort_field)
+        if column is not None:
+            stmt = stmt.order_by(column.desc() if descending else column.asc())
+        else:
+            stmt = stmt.order_by(Document.external_id.asc())
+        rows = await self.session.scalars(stmt.limit(limit).offset(offset))
         return total or 0, [to_dict(doc) for doc in rows]
 
     async def get(self, external_id: str) -> dict[str, Any] | None:

@@ -29,7 +29,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine = make_engine(app_settings)
         app.state.engine = engine
         app.state.session_factory = make_sessionmaker(engine)
+        logger.info("database pool initialized", extra={"pool_status": str(engine.pool.status())})
         yield
+        logger.info("database pool disposing", extra={"pool_status": str(engine.pool.status())})
         await engine.dispose()
 
     configure_logging(app_settings.log_level)

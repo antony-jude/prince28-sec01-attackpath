@@ -20,8 +20,12 @@ def test_ready_when_database_is_available(client: TestClient) -> None:
     assert response.json()["checks"]["database"] is True
 
 
-def test_ready_is_503_when_data_file_missing(tmp_path) -> None:
-    settings = Settings(app_env="ci", data_file=tmp_path / "missing.json", _env_file=None)
+def test_ready_is_503_when_database_is_unreachable() -> None:
+    settings = Settings(
+        app_env="ci",
+        database_url="postgresql://127.0.0.1:1/unused",
+        _env_file=None,
+    )
     with TestClient(create_app(settings)) as client:
         assert client.get("/health").status_code == 200
         response = client.get("/ready")
@@ -116,6 +120,20 @@ def test_metadata_filter(client: TestClient) -> None:
     assert response.status_code == 200
     assert [item["id"] for item in response.json()["items"]] == ["002"]
     assert response.json()["filters"] == {"year": "2024"}
+
+
+def test_sort_title(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"sort": "-title"})
+
+    assert response.status_code == 200
+    assert response.json()["items"][0]["id"] == "003"
+
+
+def test_invalid_sort_is_400(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"sort": "name"})
+
+    assert response.status_code == 400
+    assert "Invalid sort" in response.json()["detail"]
 
 
 def test_limit_above_max_is_422(client: TestClient) -> None:

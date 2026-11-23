@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 def test_sample_records_have_twenty_unique_attck_techniques() -> None:
-    sample_path = Path(__file__).parents[1] / "data" / "sample_records.json"
+    sample_path = Path(__file__).parents[2] / "data" / "sample_records.json"
     records = json.loads(sample_path.read_text(encoding="utf-8"))
 
     assert len(records) == 20

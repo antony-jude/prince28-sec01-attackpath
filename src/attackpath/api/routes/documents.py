@@ -16,8 +16,25 @@ async def list_documents(
     q: str | None = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
     offset: Annotated[int, Query(ge=0)] = 0,
+    sort: str = "external_id",
 ) -> dict[str, Any]:
-    reserved = {"q", "limit", "offset"}
+    allowed_sort = {
+        "title",
+        "-title",
+        "published_on",
+        "-published_on",
+        "external_id",
+        "-external_id",
+    }
+    if sort not in allowed_sort:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid sort. Use title, -title, published_on, -published_on, "
+                "external_id, or -external_id."
+            ),
+        )
+    reserved = {"q", "limit", "offset", "sort"}
     filters: dict[str, str] = {}
     for key, value in request.query_params.multi_items():
         if key in reserved:
@@ -25,7 +42,13 @@ async def list_documents(
         if not FILTER_KEY.fullmatch(key):
             raise HTTPException(status_code=400, detail=f"Invalid filter name '{key}'.")
         filters[key] = value
-    total, items = await repository.list(q=q, filters=filters, limit=limit, offset=offset)
+    total, items = await repository.list(
+        q=q,
+        filters=filters,
+        limit=limit,
+        offset=offset,
+        sort=sort,
+    )
     return {
         "items": items,
         "total": total,

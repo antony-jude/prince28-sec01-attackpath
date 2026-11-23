@@ -1,0 +1,3 @@
+CREATE DATABASE attackpath_test OWNER app;
+CREATE DATABASE app_test OWNER app;
+CREATE EXTENSION IF NOT EXISTS vector;

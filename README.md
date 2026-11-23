@@ -2,7 +2,7 @@
 
 Maps an incident description or log snippet to MITRE ATT&CK tactics, techniques, and mitigations, with links to the source technique pages.
 
-**Status:** Day 1 foundation (uv project, FastAPI service skeleton, sample ATT&CK records, and quality gates). Live URL planned for Day 5.
+**Status:** Local Docker Compose stack, migrations, sample ATT&CK records, and unit/integration test workflows. Live URL planned for Day 5.
 
 ## Who it's for
 
@@ -34,23 +34,32 @@ IDs change between releases: techniques can be deprecated, revoked, or split int
 
 At least 80% top-3 technique-mapping accuracy on a reviewed 50-incident test set with hand-labeled technique IDs.
 
-## Run it locally
+## Run locally in one command
 
-```powershell
-uv sync
-Copy-Item .env.example .env
-uv run uvicorn attackpath.api.main:create_app --factory --reload
+You need Docker Desktop running. From a fresh clone:
+
+```bash
+docker compose up --build
 ```
 
-Open [http://localhost:8000/docs](http://localhost:8000/docs) for the API docs. The service provides `/health`, `/ready`, `/v1/documents`, and `/v1/documents/{id}`.
+This starts Postgres with pgvector, Redis, runs migrations, loads the sample data once, and starts the API.
 
-## Checks
+- API docs: http://localhost:8000/docs
+- Liveness: http://localhost:8000/health
+- Readiness: http://localhost:8000/ready
 
-```powershell
-uv run pytest
-uv run ruff check .
-uv run pre-commit install
-uv run pre-commit run --all-files
-```
+Stop with `Ctrl+C`, then `docker compose down`. Use `docker compose down -v` to also delete the database volume.
 
-`.env` is ignored by Git; commit `.env.example` only. The sample ATT&CK records are a small starter set, not a scored evaluation dataset.
+## Develop and test
+
+| Task | Mac / Linux | Windows |
+|---|---|---|
+| Run the API with reload | `make dev` | `uv run poe dev` |
+| Unit tests (no network) | `make test` | `uv run poe test` |
+| Integration tests (Docker Compose running) | `make test-integration` | `uv run poe test-integration` |
+| Coverage report | `make cov` | `uv run poe cov` |
+| Lint and format check | `make lint` | `uv run poe lint` |
+
+On Windows, `./tasks.ps1` also provides `up`, `down`, `unit`, `integration`, `test`, `coverage`, and `lint` shortcuts; its test commands delegate to the Poe tasks above.
+
+The sample ATT&CK records are a small starter set, not a scored evaluation dataset.
