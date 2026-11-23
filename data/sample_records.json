@@ -26,7 +26,8 @@
     ],
     "detection": [
       "Detects behavioral chains where PowerShell is launched with encoded commands, unusual parent processes, or suspicious modules loaded, potentially followed by network connections or child process spawning. Supports detection of both direct (powershell.exe) and indirect (.NET automation) invocations."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1059/001/"
   },
   {
     "id": "002",
@@ -55,7 +56,8 @@
     ],
     "detection": [
       "Detects the creation, modification, or deletion of scheduled tasks through Task Scheduler, WMI, PowerShell, or API-based methods followed by execution from svchost.exe or taskeng.exe. Includes detection of hidden or anomalous scheduled tasks, especially those created under SYSTEM or suspicious user contexts."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1053/005/"
   },
   {
     "id": "003",
@@ -89,7 +91,8 @@
       "Detection of spearphishing attachments by correlating suspicious email delivery with subsequent file creation and abnormal process execution (e.g., Office spawning PowerShell or CMD). Behavior chain includes inbound email metadata → attachment stored on disk → process execution → outbound network activity.",
       "Phishing attachments executed on Linux systems are detected by linking email logs to file creation in mail directories and subsequent suspicious process execution. Look for unexpected binaries or scripts spawned from user mail directories and anomalous outbound network activity.",
       "Phishing attachment detection on macOS through correlation of Mail app logs, file creation in user directories, and abnormal process execution (e.g., Preview.app or Mail.app spawning Terminal or scripting binaries). Network traffic after attachment interaction is also monitored."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1566/001/"
   },
   {
     "id": "004",
@@ -122,7 +125,8 @@
       "Detects applications such as Automator, AppleScript, or LaunchDaemons invoking HTTP/S traffic to non-standard domains or using suspicious headers (e.g., Base64 in URIs or cookie fields).",
       "Detects HTTP or HTTPS communication initiated by shell-based scripts or management daemons, especially those reaching public IPs over ports 80/443 using embedded curl or wget.",
       "Detects Web protocol misuse such as encoded HTTP headers, WebSocket upgrade requests with abnormal payloads, or TLS handshake anomalies suggesting embedded C2 channels."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1071/001/"
   },
   {
     "id": "005",
@@ -152,7 +156,8 @@
     ],
     "detection": [
       "A non-privileged or abnormal process attempts to open a handle with full access (0x1F0FFF) to lsass.exe and subsequently invokes memory dump, file creation, or registry modification indicative of credential scraping. This behavior chain reflects staged credential theft activity."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1003/001/"
   },
   {
     "id": "006",
@@ -174,7 +179,8 @@
     ],
     "detection": [
       "Detects interactive or scripted abuse of cmd.exe, batch files, or shell invocation chains. Focuses on parent-child relationships (e.g., cmd.exe launched from unusual parents), anomalous command-line parameters, and chaining with discovery, credential access, or lateral movement behaviors."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1059/003/"
   },
   {
     "id": "007",
@@ -205,7 +211,8 @@
       "Detects execution of VB-based scripts or macros (VBS/VBA/VBScript) through cscript.exe/wscript.exe, Office-based process chains, or HTA usage. Focuses on chained behavior: Office or HTML container spawns script host > script host spawns PowerShell, network connections, or process injection.",
       "Detects embedded or emulated VBScript/VBA execution via Wine-based apps, Office for Mac abusing cross-platform .NET features, or macros dropped and invoked via AppleScript or third-party automation tools.",
       "Detects abuse of Mono/.NET Core environments to execute VB-like scripts, often in environments with Office emulation or WINE. Focus is on rare invocations of scripting hosts like mono.exe or .NET shells, often seen in spam filtering or forensic labs with Office support."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1059/005/"
   },
   {
     "id": "008",
@@ -235,7 +242,8 @@
       "Detects JavaScript execution through WSH (wscript.exe, cscript.exe) or HTA (mshta.exe), particularly when spawned from Office macros, web browsers, or abnormal user paths. Correlates script execution with outbound network activity or system modification.",
       "Detects JavaScript for Automation (JXA) via osascript or compiled scripts using OSAKit APIs. Flags execution involving system modification, inter-process scripting, or browser abuse.",
       "Detects Node.js or JavaScript interpreter execution from web shells, cron jobs, or local users. Correlates execution with reverse shell behavior, file modifications, or abnormal outbound connections."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1059/007/"
   },
   {
     "id": "009",
@@ -281,7 +289,8 @@
       "Detection of interactive and remote logins by service accounts or users at unusual times, with unexpected child process activity.",
       "Detection of valid account abuse in IdP logs via geographic anomalies, impossible travel, risky sign-ins, and multiple MFA attempts or failures.",
       "Detection of containerized service accounts or compromised kubeconfigs being used for cluster access from unexpected nodes or IPs."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1078/"
   },
   {
     "id": "010",
@@ -311,7 +320,8 @@
     ],
     "detection": [
       "Remote Desktop (RDP) logon by a user followed by unusual process execution, file access, or lateral movement activity within a short timeframe."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1021/001/"
   },
   {
     "id": "011",
@@ -332,7 +342,8 @@
     "mitigations": null,
     "detection": [
       "Correlation of Registry key creation/modification events under known Run/Startup keys with new or unusual binary paths or script-based payloads. Multi-event detection includes registry modification followed by process execution from non-standard directories or abnormal parent-child process relationships."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1547/001/"
   },
   {
     "id": "012",
@@ -364,7 +375,8 @@
       "Detects process injection by correlating memory manipulation API calls (e.g., VirtualAllocEx, WriteProcessMemory), suspicious thread creation (e.g., CreateRemoteThread), and unusual DLL loads within another process's context.",
       "Detects ptrace- or memfd-based process injection through audit logs capturing system calls (e.g., ptrace, mmap) targeting running processes along with suspicious file descriptors or memory writes.",
       "Detects memory-based injection by monitoring `task_for_pid`, `mach_vm_write`, and dylib injection patterns through `DYLD_INSERT_LIBRARIES` or manual memory mapping."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1055/"
   },
   {
     "id": "013",
@@ -397,7 +409,8 @@
       "Process execution of curl or wget followed by a network connection and a file created in temporary or user-specific directories.",
       "Command line interface or vCLI triggers remote transfer using wget or curl, writing files into datastore paths or local tmp directories.",
       "Network device logs show anomalous inbound file transfers or uncharacteristic flows with high payload volume to network devices with storage or automation hooks."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1105/"
   },
   {
     "id": "014",
@@ -435,7 +448,8 @@
       "Repeated failed authentication attempts to container APIs, control planes, or login shells across many user names using same password",
       "Failed authentication attempts across user mailboxes using identical or common passwords (e.g., OWA brute attempts)",
       "SaaS applications receiving authentication failures for dozens of accounts using same password or login signature"
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1110/003/"
   },
   {
     "id": "015",
@@ -474,7 +488,8 @@
       "ESXi shell or vim-cmd execution that deletes all VM snapshots using vmsvc/snapshot.removeall or rm on snapshot paths",
       "Execution of `erase`, `format`, and `reload` in immediate sequence from a privileged AAA session",
       "Cloud API calls disabling snapshot scheduling, backup policies, versioning, followed by DeleteSnapshot/DeleteVolume operations"
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1490/"
   },
   {
     "id": "016",
@@ -499,7 +514,8 @@
     ],
     "detection": [
       "Detects adversarial abuse of WMI to execute local or remote commands via WMIC, PowerShell, or COM API through a multi-event chain: process creation, command execution, and corresponding network connection if remote."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1047/"
   },
   {
     "id": "017",
@@ -528,7 +544,8 @@
       "Detects creation or modification of crontab entries by non-root users or from abnormal parent processes, followed by the execution of uncommon binaries at scheduled intervals.",
       "Detects crontab job additions or modifications via `crontab` utility or direct edits, especially those created by interactive users executing hidden or renamed scripts.",
       "Detects direct modification of crontab entries in /var/spool/cron/crontabs/root or /etc/rc.local.d/local.sh followed by execution of scripts linked to lateral movement or malware persistence."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1053/003/"
   },
   {
     "id": "018",
@@ -560,7 +577,8 @@
       "Detects scripting environments (AppleScript, osascript, curl) or non-native tools performing DNS queries with encoded subdomains, often used for data exfiltration or beaconing.",
       "Detects clients issuing DNS queries with high volume, long subdomain lengths, encoded payload patterns, or to known malicious infrastructure; indicative of DNS-based C2 channels.",
       "Detects unusual outbound DNS traffic from ESXi hosts, often from shell scripts, custom daemons, or malicious VIBs interacting with external DNS infrastructure outside the management plane."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1071/004/"
   },
   {
     "id": "019",
@@ -596,7 +614,8 @@
       "Detection of spearphishing links through mail logs and browser activity. Behavior includes email with suspicious URLs → user click recorded in mail/web proxy logs → shell or interpreter launched from browser process.",
       "Correlation of Mail.app logs with Safari/Chrome activity. Suspicious behavior includes email links → Safari/Chrome accessing newly registered or lookalike domains → osascript or Terminal spawned unexpectedly.",
       "Detection of OAuth consent phishing or malicious login attempts initiated through spearphishing links. Behavior chain includes inbound email with OAuth URL → consent page visited → unusual token grants logged in IdP logs."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1566/002/"
   },
   {
     "id": "020",
@@ -629,6 +648,7 @@
       "Userland or kernel-level ransomware encrypting user files (Documents, Desktop) using `srm`, `gpg`, or compiled payloads. Often correlated with ransom note creation in multiple directories.",
       "Ransomware encrypts .vmdk, .vmx, .log, or VM config files in VMFS datastores. May rename to .locked or delete/overwrite with encrypted versions. Often correlates with shell commands run through `dcui`, SSH, or vSphere.",
       "Encryption of cloud storage objects (e.g., S3 buckets) via Server-Side Encryption (SSE-C) or by replacing objects with encrypted variants. May include API patterns like PutObject with SSE-C headers."
-    ]
+    ],
+    "source_url": "https://attack.mitre.org/techniques/T1486/"
   }
 ]

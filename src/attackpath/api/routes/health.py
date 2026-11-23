@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+
+from attackpath.api.deps import check_db
 
 router = APIRouter(tags=["health"])
 
@@ -10,17 +12,12 @@ def health() -> dict[str, str]:
 
 
 @router.get("/ready")
-def ready(request: Request) -> JSONResponse:
-    records = getattr(request.app.state, "records", None)
-    is_loaded = records is not None
-    status_code = 200 if is_loaded else 503
+async def ready(database_ready: bool = Depends(check_db)) -> JSONResponse:
+    status_code = 200 if database_ready else 503
     return JSONResponse(
         {
-            "status": "ready" if is_loaded else "not_ready",
-            "checks": {
-                "records_loaded": is_loaded,
-                "records_count": len(records) if is_loaded else 0,
-            },
+            "status": "ready" if database_ready else "not_ready",
+            "checks": {"database": database_ready},
         },
         status_code=status_code,
     )

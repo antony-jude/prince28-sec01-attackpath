@@ -13,22 +13,34 @@ def test_health_is_ok(client: TestClient) -> None:
     assert response.json()["status"] == "ok"
 
 
-def test_ready_when_records_loaded(client: TestClient) -> None:
+def test_ready_when_database_is_available(client: TestClient) -> None:
     response = client.get("/ready")
 
     assert response.status_code == 200
-    assert response.json()["checks"]["records_loaded"] is True
-    assert response.json()["checks"]["records_count"] == 3
+    assert response.json()["checks"]["database"] is True
 
 
-def test_ready_is_503_when_data_file_missing(tmp_path) -> None:
-    settings = Settings(app_env="ci", data_file=tmp_path / "missing.json", _env_file=None)
+def test_ready_is_503_when_database_is_unreachable() -> None:
+    settings = Settings(
+        app_env="ci",
+        database_url="postgresql://127.0.0.1:1/unused",
+        _env_file=None,
+    )
     with TestClient(create_app(settings)) as client:
         assert client.get("/health").status_code == 200
         response = client.get("/ready")
 
     assert response.status_code == 503
-    assert response.json()["checks"]["records_loaded"] is False
+    assert response.json()["checks"]["database"] is False
+
+
+def test_ready_is_503_when_database_is_down(client: TestClient, db_state) -> None:
+    db_state["up"] = False
+    response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json()["checks"]["database"] is False
+    db_state["up"] = True
 
 
 def test_list_documents_paginates(client: TestClient) -> None:
@@ -77,6 +89,57 @@ def test_request_id_is_echoed(client: TestClient) -> None:
     response = client.get("/health", headers={"X-Request-ID": "abc123"})
 
     assert response.headers["X-Request-ID"] == "abc123"
+
+
+def test_bad_filter_name_is_400_problem(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"Bad-Name": "1"})
+
+    assert response.status_code == 400
+    assert response.headers["content-type"] == "application/problem+json"
+    assert "Invalid filter name" in response.json()["detail"]
+
+
+def test_offset_is_applied(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"limit": 1, "offset": 2})
+
+    assert response.status_code == 200
+    assert response.json()["items"][0]["id"] == "003"
+
+
+def test_no_search_results(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"q": "not-present"})
+
+    assert response.status_code == 200
+    assert response.json()["items"] == []
+    assert response.json()["total"] == 0
+
+
+def test_metadata_filter(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"year": "2024"})
+
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()["items"]] == ["002"]
+    assert response.json()["filters"] == {"year": "2024"}
+
+
+def test_sort_title(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"sort": "-title"})
+
+    assert response.status_code == 200
+    assert response.json()["items"][0]["id"] == "003"
+
+
+def test_invalid_sort_is_400(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"sort": "name"})
+
+    assert response.status_code == 400
+    assert "Invalid sort" in response.json()["detail"]
+
+
+def test_limit_above_max_is_422(client: TestClient) -> None:
+    response = client.get("/v1/documents", params={"limit": 101})
+
+    assert response.status_code == 422
 
 
 def test_app_refuses_to_start_without_app_env(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -1,39 +1,69 @@
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from attackpath.api.deps import get_records
-from attackpath.store import Record
+from attackpath.api.deps import get_repository
+from attackpath.db.repository import FILTER_KEY, DocumentRepository
 
 router = APIRouter(prefix="/v1/documents", tags=["documents"])
-RecordsDependency = Annotated[list[Record], Depends(get_records)]
+RepositoryDependency = Annotated[DocumentRepository, Depends(get_repository)]
 
 
 @router.get("")
-def list_documents(
-    records: RecordsDependency,
+async def list_documents(
+    request: Request,
+    repository: RepositoryDependency,
     q: str | None = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
     offset: Annotated[int, Query(ge=0)] = 0,
+    sort: str = "external_id",
 ) -> dict[str, Any]:
-    filtered = records
-    if q:
-        search_term = q.casefold()
-        filtered = [record for record in records if search_term in str(record).casefold()]
+    allowed_sort = {
+        "title",
+        "-title",
+        "published_on",
+        "-published_on",
+        "external_id",
+        "-external_id",
+    }
+    if sort not in allowed_sort:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid sort. Use title, -title, published_on, -published_on, "
+                "external_id, or -external_id."
+            ),
+        )
+    reserved = {"q", "limit", "offset", "sort"}
+    filters: dict[str, str] = {}
+    for key, value in request.query_params.multi_items():
+        if key in reserved:
+            continue
+        if not FILTER_KEY.fullmatch(key):
+            raise HTTPException(status_code=400, detail=f"Invalid filter name '{key}'.")
+        filters[key] = value
+    total, items = await repository.list(
+        q=q,
+        filters=filters,
+        limit=limit,
+        offset=offset,
+        sort=sort,
+    )
     return {
-        "items": filtered[offset : offset + limit],
-        "total": len(filtered),
+        "items": items,
+        "total": total,
         "limit": limit,
         "offset": offset,
+        "filters": filters,
     }
 
 
 @router.get("/{document_id}")
-def get_document(
+async def get_document(
     document_id: str,
-    records: RecordsDependency,
-) -> Record:
-    for record in records:
-        if record["id"] == document_id:
-            return record
-    raise HTTPException(status_code=404, detail=f"No document with id '{document_id}'.")
+    repository: RepositoryDependency,
+) -> dict[str, Any]:
+    document = await repository.get(document_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"No document with id '{document_id}'.")
+    return document

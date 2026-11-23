@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_env: Literal["local", "ci", "production"]
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     data_file: Path = Path("data/sample_records.json")
+    database_url: str = "postgresql://localhost:5432/attackpath"
 
 
 @lru_cache
