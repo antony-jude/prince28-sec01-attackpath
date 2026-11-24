@@ -120,3 +120,39 @@ uv run poe cov (with integration tests) -> TOTAL 91%; 30 passed
 Integration tests create a unique temporary database from Compose's `app_test` admin database, run the real migrations, and drop it afterward.
 
 `logging_setup.py` has startup logging branches that the test client does not exercise; they matter, but are low-risk configuration code. `api/errors.py` still has an unhandled-exception response path not covered by normal endpoint tests; it should gain a focused regression test when that behavior changes.
+
+## D05 · CI/CD and going live
+
+- Live URL: https://prince28-sec01-attackpath.onrender.com
+- CI run for pull request 1: https://github.com/antony-jude/prince28-sec01-attackpath/actions/runs/45337110363
+- First merge-triggered CD workflow: https://github.com/antony-jude/prince28-sec01-attackpath/actions/runs/45337290698. It was triggered by merge commit `fcf1182`; its third attempt passed after the Render service was changed to the matching GHCR image source.
+- Merge clicked at 11:29 IST → successful smoke test at 11:59 IST → lead time: about 30 minutes. The initial delay was configuration repair, not a code or migration failure.
+
+### Smoke test output from CD
+
+```text
+ok  /health -> 200, version fcf11823a039b22ad0d5aab1abbbd179b530716e
+ok  /ready -> 200 {'status': 'ready', 'checks': {'database': True}}
+ok  /v1/documents?limit=1 -> 200
+Smoke test passed
+```
+
+### Rollback drill
+
+- Rolled back to `9c50a9d16aed1936c81ffbeec29b0eb09ec59ba2`: started 12:01 IST, smoke passed about 12:02 IST (38 seconds).
+- Rolled forward to `fcf11823a039b22ad0d5aab1abbbd179b530716e`: started 12:03 IST, smoke passed about 12:04 IST (38 seconds).
+- The rollback changes only the app image; `workflow_dispatch` skips migrations, so the database remains on the newer schema.
+- That is safe here because migration `0003` only adds a nullable `technique_id` column and an index. Older code continues to use the existing columns, and no schema or data downgrade is attempted.
+
+### Where my secrets live
+
+- Neon string: GitHub Secret `DATABASE_URL` and the Render environment; it is not in Git or the image.
+- Render deploy hook: GitHub Secret `RENDER_DEPLOY_HOOK` only.
+
+### Monitoring and stretch work
+
+- UptimeRobot checks `/health` every 5 minutes and alerts by email; monitor `804788231` is currently Up.
+- A paid always-on Render instance would avoid the Free plan's cold-start delay on the first request.
+- Dependabot checks GitHub Actions weekly, and CI runs pre-commit across all files.
+- CD runs 1–3 completed in 23s, 38s, and 38s respectively (about 33s average); the smoke-test wait is the slowest observed step.
+- A production human gate must be enabled manually in GitHub Environment settings because it changes repository security policy. It is worth the delay for high-risk production changes that need a human review before rollout.

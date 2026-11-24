@@ -3,8 +3,10 @@
 Maps an incident description or log snippet to MITRE ATT&CK tactics, techniques, and mitigations, with links to the source technique pages.
 
 [![CI](https://github.com/antony-jude/prince28-sec01-attackpath/actions/workflows/ci.yml/badge.svg)](https://github.com/antony-jude/prince28-sec01-attackpath/actions/workflows/ci.yml)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fprince28-sec01-attackpath.onrender.com%2Fhealth&label=live)](https://prince28-sec01-attackpath.onrender.com/docs)
+[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/m804788231-170d1d58c2ad380f410d15d2)](https://prince28-sec01-attackpath.onrender.com/health)
 
-**Status:** Live Docker deployment with migrations, smoke checks, and a five-minute health monitor.
+**Status:** Week 1 complete · live at https://prince28-sec01-attackpath.onrender.com.
 
 **Live:** [https://prince28-sec01-attackpath.onrender.com](https://prince28-sec01-attackpath.onrender.com) · [health](https://prince28-sec01-attackpath.onrender.com/health) · [API docs](https://prince28-sec01-attackpath.onrender.com/docs)
 
