@@ -6,11 +6,27 @@ from attackpath.api.main import create_app
 from attackpath.config import Settings
 
 
-def test_health_is_ok(client: TestClient) -> None:
+def test_health_reports_default_version(client: TestClient) -> None:
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    assert response.json() == {
+        "status": "ok",
+        "app": "attackpath",
+        "env": "ci",
+        "version": "dev",
+    }
+
+
+def test_health_reports_configured_version() -> None:
+    settings = Settings(app_env="production", git_sha="abc123", _env_file=None)
+
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["version"] == "abc123"
+    assert response.json()["env"] == "production"
 
 
 def test_ready_when_database_is_available(client: TestClient) -> None:
