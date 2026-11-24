@@ -2,7 +2,11 @@
 
 Maps an incident description or log snippet to MITRE ATT&CK tactics, techniques, and mitigations, with links to the source technique pages.
 
-**Status:** Local Docker Compose stack, migrations, sample ATT&CK records, and unit/integration test workflows. Live URL planned for Day 5.
+[![CI](https://github.com/antony-jude/prince28-sec01-attackpath/actions/workflows/ci.yml/badge.svg)](https://github.com/antony-jude/prince28-sec01-attackpath/actions/workflows/ci.yml)
+
+**Status:** Live Docker deployment with migrations, smoke checks, and a five-minute health monitor.
+
+**Live:** [https://prince28-sec01-attackpath.onrender.com](https://prince28-sec01-attackpath.onrender.com) · [health](https://prince28-sec01-attackpath.onrender.com/health) · [API docs](https://prince28-sec01-attackpath.onrender.com/docs)
 
 ## Who it's for
 
