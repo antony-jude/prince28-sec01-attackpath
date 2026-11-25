@@ -1,0 +1,14 @@
+# Sources for ATTACKpath. One row per file to download. Lines starting with # are notes.
+# Start target: Enterprise matrix: all techniques + sub-techniques (about 800 objects)
+# Every row has a source and an attribution/terms note; the downloader rejects blank licences.
+url,source,licence,title
+https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack.json,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Enterprise ATT&CK STIX JSON
+https://attack.mitre.org/techniques/T1059/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Command and Scripting Interpreter
+https://attack.mitre.org/techniques/T1059/001/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",PowerShell
+https://attack.mitre.org/techniques/T1566/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Phishing
+https://attack.mitre.org/techniques/T1566/001/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Spearphishing Attachment
+https://attack.mitre.org/techniques/T1053/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Scheduled Task Job
+https://attack.mitre.org/techniques/T1053/005/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Scheduled Task
+https://attack.mitre.org/techniques/T1486/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Data Encrypted for Impact
+https://attack.mitre.org/techniques/T1021/001/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",Remote Services RDP
+https://attack.mitre.org/techniques/T1071/004/,mitre-attack,"MITRE ATT&CK terms of use; attribution to The MITRE Corporation",DNS Application Layer Protocol

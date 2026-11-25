@@ -156,3 +156,37 @@ Smoke test passed
 - Dependabot checks GitHub Actions weekly, and CI runs pre-commit across all files.
 - CD runs 1–3 completed in 23s, 38s, and 38s respectively (about 33s average); the smoke-test wait is the slowest observed step.
 - A production human gate must be enabled manually in GitHub Environment settings because it changes repository security policy. It is worth the delay for high-risk production changes that need a human review before rollout.
+
+## D06 · Collecting the corpus
+
+- Start target: Enterprise matrix: all techniques + sub-techniques (about 800 objects).
+- Collected today: **10 files, 10 measured pages, 54.91 MB** (from `DATASET.md`).
+- Doors used: **URL list**. The official Enterprise STIX JSON is the large start-target file; nine focused ATT&CK technique pages support the seed questions.
+
+### Licence check
+
+| Source | Licence or terms, in my words | May I show full text in answers? |
+|---|---|---|
+| MITRE ATT&CK and ATT&CK STIX data | Reuse is allowed with attribution to The MITRE Corporation under the ATT&CK terms of use. | No: show links and short attributed excerpts, not an entire source document. |
+
+### robots.txt
+
+- Site: **attack.mitre.org**. Its robots.txt allows the bot except for `/previous/` and `/versions/`; the selected current technique pages were allowed.
+- Site: **raw.githubusercontent.com**. Its robots.txt returned 404, which the downloader treats as no published restriction; the request completed successfully.
+- Nothing was blocked for my bot. The downloader still records a `blocked` status if a future source denies `examate-student-bot` or returns a robots 5xx.
+
+### Kill and resume
+
+- Run 1: I pressed Ctrl+C after **8 files** completed; no `.part` file remained in `data/raw/`.
+- Run 2: **downloaded=2, skipped=8**.
+- Run 3: **downloaded=0, skipped=10**.
+
+### Capacity (from docs/CAPACITY.md)
+
+- Tokens per page, measured: **750** (conservative mixed-file estimate; refresh after more families are collected).
+- Full corpus: **1.88 M tokens, 3,750 chunks, embedding about Rs 71, vectors 14.6 MB** at the documented assumptions.
+- The number that surprised me most was the raw Enterprise export: the ten-file starter corpus is **54.91 MB** even though the focused HTML pages are small, so the worker needs object storage before the full three-version corpus.
+
+### One thing that went wrong today, and how I fixed it
+
+The first local report invocation hit a Windows sandbox cache permission error. I reran it with the approved environment, and the report completed. The interrupted crawl itself resumed cleanly from the manifest.
