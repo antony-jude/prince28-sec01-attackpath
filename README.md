@@ -69,3 +69,35 @@ Stop with `Ctrl+C`, then `docker compose down`. Use `docker compose down -v` to 
 On Windows, `./tasks.ps1` also provides `up`, `down`, `unit`, `integration`, `test`, `coverage`, and `lint` shortcuts; its test commands delegate to the Poe tasks above.
 
 The sample ATT&CK records are a small starter set, not a scored evaluation dataset.
+
+## Collect the corpus
+
+Day 6 adds a polite, resumable corpus pipeline. Licensed source rows live in
+`data/sources.csv`; the append-only `data/manifest.jsonl` records each URL,
+licence, size, checksum, and status. Raw files stay out of Git under `data/raw/`.
+
+```bash
+uv run python scripts/fetch.py urls
+uv run python scripts/dataset_report.py --full-files 2500
+```
+
+The fetcher checks `robots.txt`, identifies itself as `examate-student-bot/0.1`,
+limits concurrency to four requests, uses per-host delays and retry backoff,
+and resumes completed files after an interruption. See [DATASET.md](DATASET.md)
+and [docs/CAPACITY.md](docs/CAPACITY.md) for the measured corpus and estimates.
+
+### Parse the corpus into pages
+
+Day 7 stores citation-ready pages in Postgres and records parser dead letters:
+
+```bash
+uv run alembic upgrade head
+uv run python scripts/parse_corpus.py
+uv run python scripts/compare_parsers.py
+```
+
+Each page keeps its number, heading path, cleaned text, and Markdown tables. A
+failed raw file is written to `parse_failures` with a reason, detail, checksum,
+and retry count. Use `--retry-failed` after replacing a source, `--ocr eng` for
+local scanned PDFs, and `GET /v1/documents/{id}/pages/{page_no}` to inspect a
+stored page.

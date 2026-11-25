@@ -1,6 +1,7 @@
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import Path as ApiPath
 
 from attackpath.api.deps import get_repository
 from attackpath.db.repository import FILTER_KEY, DocumentRepository
@@ -67,3 +68,17 @@ async def get_document(
     if document is None:
         raise HTTPException(status_code=404, detail=f"No document with id '{document_id}'.")
     return document
+
+
+@router.get("/{document_id}/pages/{page_no}")
+async def get_document_page(
+    document_id: str,
+    page_no: Annotated[int, ApiPath(ge=1)],
+    repository: RepositoryDependency,
+) -> dict[str, Any]:
+    page = await repository.get_page(document_id, page_no)
+    if page is None:
+        raise HTTPException(
+            status_code=404, detail=f"No page {page_no} for document '{document_id}'."
+        )
+    return page
