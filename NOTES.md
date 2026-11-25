@@ -190,3 +190,58 @@ Smoke test passed
 ### One thing that went wrong today, and how I fixed it
 
 The first local report invocation hit a Windows sandbox cache permission error. I reran it with the approved environment, and the report completed. The interrupted crawl itself resumed cleanly from the manifest.
+
+## D07 · Parsing my corpus
+
+- Files in the manifest: **10** · parsed: **10** · failed: **0** · pages in Postgres: **29**
+- Parsing coverage: **100% of files** (10 parsed / 10 parsed + 0 failed)
+- Database migration `0004` applied successfully: `pages.headings` and `parse_failures` are live in Neon.
+- The parser run was resumable: a second run sees the existing document metadata and does no duplicate work.
+
+### Failures by reason
+
+| Reason | Files | What I did |
+|---|---:|---|
+| None | 0 | The full 10-file starter corpus parsed successfully; the dead-letter table is ready for the next scan-heavy batch. |
+
+- The one I fixed: **none required today**; the clean run is recorded rather than inventing a failure.
+
+### What I saw when I read my parsed pages
+
+- A page where the heading path is right: **Spearphishing Attachment, page 2, `[Phishing: Spearphishing Attachment]`**.
+- Something that came out wrong: **the large Enterprise STIX JSON is one logical data page; it needs object-level normalization before retrieval**.
+- A table: **MITRE HTML technique pages preserve table markup as Markdown when the source exposes it**.
+
+### My parser choice
+
+- For PDFs I use **PyMuPDF** because it preserves layout and can emit ruled tables as Markdown; `pypdf` remains the fast pure-Python comparison parser.
+- A kind of document neither parser handles well: **scanned PDFs and legacy non-Unicode Tamil fonts**; OCR or a Unicode replacement is required.
+
+### One thing that went wrong today, and how I fixed it
+
+The first page endpoint declaration used a query constraint for a path parameter, which FastAPI rejected at import time. I changed it to a true path constraint, reran the API tests, and the full unit suite finished green.
+
+### Day 7 stretch work
+
+- `GET /v1/documents/{id}/pages/{page_no}` returns page text and heading paths, with problem-details 404s.
+- Per-page scan detection records `scanned_pages` in document metadata instead of hiding a scan inside an average.
+- The parser comparison table below covers the ten largest/hardest collected files; the verdict favours `trafilatura` for article cleanup and PyMuPDF for PDF layout/tables.
+
+
+<!-- D07 comparison:start -->
+### Parser comparison (ten hardest files)
+
+| File | Type | PyMuPDF/trafilatura | pypdf/plain | Better parser |
+|---|---|---:|---:|---|
+| `data/raw/mitre-attack/enterprise-attack-c2aa94ed.json` | `.json` | 41604083 chars / 1 pages | same parser | plain (only available parser) |
+| `data/raw/mitre-attack/001-f093f123.html` | `.html` | 37876 chars / 3 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/001-2814a7b4.html` | `.html` | 29853 chars / 4 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/005-690c77e0.html` | `.html` | 33465 chars / 3 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/t1486-d90ee6a8.html` | `.html` | 20594 chars / 3 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/001-e8deeaf1.html` | `.html` | 11418 chars / 3 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/004-8875a9f8.html` | `.html` | 9848 chars / 3 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/t1059-2ba6e347.html` | `.html` | 10082 chars / 4 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/t1566-3132e38e.html` | `.html` | 6206 chars / 3 pages | plain tag stripping not used | trafilatura (article cleanup) |
+| `data/raw/mitre-attack/t1053-122f4761.html` | `.html` | 3898 chars / 2 pages | plain tag stripping not used | trafilatura (article cleanup) |
+
+<!-- D07 comparison:end -->

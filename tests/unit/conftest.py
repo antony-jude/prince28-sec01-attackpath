@@ -57,6 +57,16 @@ def client(data_file: Path, db_state: dict[str, bool]) -> Iterator[TestClient]:
                         return record
                 return None
 
+            async def get_page(self, external_id, page_no):
+                if external_id == "001" and page_no == 1:
+                    return {
+                        "document_id": external_id,
+                        "page_no": page_no,
+                        "headings": ["Guidelines"],
+                        "text": "Alpha page",
+                    }
+                return None
+
         class FakeSession:
             async def execute(self, *_args, **_kwargs):
                 return None

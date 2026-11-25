@@ -81,6 +81,20 @@ def test_get_document_found(client: TestClient) -> None:
     assert response.json()["title"] == "Alpha guideline"
 
 
+def test_get_document_page_returns_headings(client: TestClient) -> None:
+    response = client.get("/v1/documents/001/pages/1")
+
+    assert response.status_code == 200
+    assert response.json()["headings"] == ["Guidelines"]
+
+
+def test_get_missing_page_is_problem_details(client: TestClient) -> None:
+    response = client.get("/v1/documents/001/pages/99")
+
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/problem+json"
+
+
 def test_missing_document_is_problem_details(client: TestClient) -> None:
     response = client.get("/v1/documents/999")
     body = response.json()

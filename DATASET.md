@@ -29,6 +29,14 @@ MITRE ATT&CK terms of use allow reuse with attribution to The MITRE Corporation.
 The manifest is append-only and stores URL, source, licence, content type, size, SHA-256, and fetch status.
 <!-- generated:end -->
 
+## Parsing coverage (Day 7)
+
+- Parsed documents in Postgres: **10**
+- Parsed pages in Postgres: **29**
+- Parse failures: **0**
+- Parsing coverage: **100% of files**
+- Every page stores its page number and heading path; failed files are retained in `parse_failures` with a reason and retry count.
+
 ## Known gaps
 
 - The first corpus contains the current Enterprise STIX export and ten focused technique pages; Mobile, ICS, groups, software, mitigations, and two older ATT&CK releases remain future expansion work.
