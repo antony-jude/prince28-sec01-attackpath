@@ -5,7 +5,9 @@ from fastapi import Depends, Request
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from attackpath.db.llm_calls import UsageRepository
 from attackpath.db.repository import DocumentRepository
+from attackpath.llm.gateway import LLMGateway
 
 
 async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
@@ -28,3 +30,15 @@ SessionDependency = Annotated[AsyncSession, Depends(get_session)]
 
 def get_repository(session: SessionDependency) -> DocumentRepository:
     return DocumentRepository(session)
+
+
+def get_gateway(request: Request) -> LLMGateway:
+    return request.app.state.gateway
+
+
+def get_usage_repository(session: SessionDependency) -> UsageRepository:
+    return UsageRepository(session)
+
+
+GatewayDep = Annotated[LLMGateway, Depends(get_gateway)]
+UsageDep = Annotated[UsageRepository, Depends(get_usage_repository)]

@@ -1,5 +1,6 @@
 import json
 import logging
+from contextvars import ContextVar
 from datetime import UTC, datetime
 
 
@@ -22,3 +23,6 @@ def configure_logging(level: str) -> None:
     handler = logging.StreamHandler()
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler], force=True)
+
+
+request_id_ctx: ContextVar[str] = ContextVar("request_id", default="-")
