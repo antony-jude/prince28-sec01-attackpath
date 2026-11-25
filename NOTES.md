@@ -245,3 +245,12 @@ The first page endpoint declaration used a query constraint for a path parameter
 | `data/raw/mitre-attack/t1053-122f4761.html` | `.html` | 3898 chars / 2 pages | plain tag stripping not used | trafilatura (article cleanup) |
 
 <!-- D07 comparison:end -->
+
+### D08 · LLM gateway
+
+- Primary: Gemini (`gemini-3.8-flash`) with Groq (`openai/gpt-oss-20b`) fallback.
+- `POST /v1/chat` streams SSE deltas and records provider, model, tokens, latency and rupee list-price estimate in `llm_calls`.
+- `GET /v1/usage` summarizes calls, errors, fallbacks, tokens and cost by day.
+- Keys are environment-only: `.env.example` contains names with empty values; no provider key is committed.
+- The prompt explicitly keeps ATTACKpath defensive, admits uncertainty, and states that documents are not connected until Week 3.
+- Local provider timings and token comparison will be filled after the two provider keys are supplied; CI uses `FakeLLM` and never needs keys.

@@ -12,10 +12,14 @@ from attackpath.api.errors import (
     validation_exception_handler,
 )
 from attackpath.api.middleware import install_request_middleware
+from attackpath.api.routes.chat import PROMPT_VERSION, load_prompt
+from attackpath.api.routes.chat import router as chat_router
 from attackpath.api.routes.documents import router as documents_router
 from attackpath.api.routes.health import router as health_router
 from attackpath.config import Settings, get_settings
+from attackpath.db.llm_calls import record_call
 from attackpath.db.session import make_engine, make_sessionmaker
+from attackpath.llm.gateway import build_gateway
 from attackpath.logging_setup import configure_logging
 
 logger = logging.getLogger(__name__)
@@ -37,10 +41,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging(app_settings.log_level)
     app = FastAPI(title=app_settings.app_name, lifespan=lifespan)
     app.state.settings = app_settings
+    app.state.system_prompt = load_prompt(app_settings.prompts_dir, PROMPT_VERSION)
+
+    async def recorder(row):
+        async with app.state.session_factory() as session:
+            await record_call(session, row)
+
+    app.state.gateway = build_gateway(app_settings, recorder=recorder)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)
     install_request_middleware(app)
     app.include_router(health_router)
     app.include_router(documents_router)
+    app.include_router(chat_router, prefix="/v1")
     return app
