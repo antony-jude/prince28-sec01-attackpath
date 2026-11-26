@@ -1,0 +1,20 @@
+{"question":"What is T1566.001 and which mitigations does ATT&CK list for it?","label":"docs"}
+{"question":"Which data sources help detect credential dumping from LSASS memory?","label":"docs"}
+{"question":"Which techniques is APT29 known to use for initial access?","label":"docs"}
+{"question":"An attacker sent a macro-enabled Excel file and ran encoded PowerShell. Map each step to ATT&CK.","label":"docs"}
+{"question":"How do I detect scheduled task creation with ATT&CK?","label":"docs"}
+{"question":"What mitigation applies to phishing attachments?","label":"docs"}
+{"question":"Can you explain T1059.001 in simple terms?","label":"docs"}
+{"question":"Which platforms support Remote Services?","label":"docs"}
+{"question":"What does Data Encrypted for Impact mean?","label":"docs"}
+{"question":"List detections for DNS application layer protocol.","label":"docs"}
+{"question":"What alerts did my bank receive tonight?","label":"personal"}
+{"question":"Read my private incident queue and rank it.","label":"personal"}
+{"question":"What is my current API usage?","label":"personal"}
+{"question":"Tell me which of my clients is affected now.","label":"personal"}
+{"question":"Can you access my private GitHub messages?","label":"personal"}
+{"question":"What is the weather in Chennai today?","label":"off_topic"}
+{"question":"Who won yesterday's cricket match?","label":"off_topic"}
+{"question":"Write a poem about a lighthouse.","label":"off_topic"}
+{"question":"Help me book a restaurant for tonight.","label":"off_topic"}
+{"question":"What is the capital of France?","label":"off_topic"}
