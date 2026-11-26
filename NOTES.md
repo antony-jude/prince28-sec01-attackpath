@@ -254,3 +254,11 @@ The first page endpoint declaration used a query constraint for a path parameter
 - Keys are environment-only: `.env.example` contains names with empty values; no provider key is committed.
 - The prompt explicitly keeps ATTACKpath defensive, admits uncertainty, and states that documents are not connected until Week 3.
 - Local provider timings and token comparison will be filled after the two provider keys are supplied; CI uses `FakeLLM` and never needs keys.
+
+### D09 · Prompts and structured output
+
+- Best router prompt: `classify_v4`; four immutable classifier versions are committed.
+- Test set: 20 labelled questions across `docs`, `personal`, and `off_topic`; leak checks prevent copied examples.
+- `DocMeta` keeps document kind, year, language, summary, topics and bounded ATT&CK fields as a strict Pydantic contract.
+- Extraction is resumable by prompt version and stores validated fields under `documents.metadata.extract`; failures retain their reason.
+- Live extraction must be run with the Neon-backed `scripts/extract_metadata.py`; this local change does not fabricate database results.

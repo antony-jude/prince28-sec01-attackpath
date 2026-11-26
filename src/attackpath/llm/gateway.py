@@ -71,10 +71,12 @@ class OpenAICompatProvider:
         self._headers = {"Authorization": f"Bearer {api_key}"}
         self._client = client or httpx.AsyncClient(timeout=httpx.Timeout(timeout, connect=10.0))
 
-    def _body(self, messages, temperature, stream):
+    def _body(self, messages, temperature, stream, response_format=None):
         body = {"model": self.model, "messages": messages, "temperature": temperature}
         if stream:
             body |= {"stream": True, "stream_options": {"include_usage": True}}
+        if response_format:
+            body["response_format"] = response_format
         return body
 
     @staticmethod
@@ -87,10 +89,12 @@ class OpenAICompatProvider:
             retry_after=retry_after,
         )
 
-    async def generate(self, messages, *, temperature=0.2):
+    async def generate(self, messages, *, temperature=0.2, response_format=None):
         try:
             response = await self._client.post(
-                self._url, headers=self._headers, json=self._body(messages, temperature, False)
+                self._url,
+                headers=self._headers,
+                json=self._body(messages, temperature, False, response_format),
             )
         except httpx.TransportError as exc:
             raise LLMError(

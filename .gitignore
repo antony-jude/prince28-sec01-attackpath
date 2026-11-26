@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .coverage
+eval/cache/
 htmlcov/
 # Secrets: never commit
 .env
